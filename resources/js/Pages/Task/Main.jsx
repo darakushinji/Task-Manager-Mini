@@ -30,6 +30,7 @@ export default function Main() {
         const fetchingInProgress = async () => {
             try {
                 const res = await axios.get("/in-progress/tasks");
+                console.log(res.data.inProgress);
                 setInProgress(res.data.inProgress);
             } catch (error) {
                 console.error("Error fetching in-progress tasks, ", error);
@@ -39,7 +40,7 @@ export default function Main() {
         fetchingInProgress();
         const interval = setInterval(fetchingInProgress, 1000);
         return () => clearInterval(interval);
-    });
+    }, []);
 
     // for completed tasks
     useEffect(() => {
@@ -54,7 +55,7 @@ export default function Main() {
         fetchingCompleted();
         const interval = setInterval(fetchingCompleted, 1000);
         return () => clearInterval(interval);
-    });
+    }, []);
 
     return (
         <AuthenticatedLayout>
@@ -99,19 +100,44 @@ export default function Main() {
             <div className="mt-4 space-y-6">
                 {activeTab === "pending" && (
                     <div>
-                        {pendings.map((pending) => (
-                            <h1>{pending.title}</h1>
-                        ))}
+                        {pendings.length > 0 ? (
+                            pendings.map((task) => (
+                                <div key={task.id}>
+                                    <p>{task.title}</p>
+                                    <p>{task.description}</p>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No pending tasks! </p>
+                        )}
                     </div>
                 )}
                 {activeTab === "in-progress" && (
                     <div>
-                        <h1>In-progress Tasks</h1>
+                        {inProgress.length > 0 ? (
+                            inProgress.map((task) => (
+                                <div key={task.id}>
+                                    <p>{task.title}</p>
+                                    <p>{task.description}</p>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No in-progress tasks</p>
+                        )}
                     </div>
                 )}
                 {activeTab === "completed" && (
                     <div>
-                        <h1>Completed Tasks</h1>
+                        {completed.length > 0 ? (
+                            completed.map((task) => (
+                                <div key={task.id}>
+                                    <p>{task.title}</p>
+                                    <p>{task.description}</p>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No completed tasks! </p>
+                        )}
                     </div>
                 )}
             </div>
