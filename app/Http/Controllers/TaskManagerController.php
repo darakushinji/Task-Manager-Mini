@@ -41,4 +41,16 @@ class TaskManagerController extends Controller
         ]);
     }
 
+    public function getCompleted()
+    {
+        $completed = Task::where('user_id', auth()->id())
+            ->where('status', 'completed')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'completed' => $completed,
+        ]);
+    }
+
 }
