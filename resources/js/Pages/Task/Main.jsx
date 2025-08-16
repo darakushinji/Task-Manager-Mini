@@ -5,12 +5,12 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 export default function Main() {
     const [activeTab, setActiveTab] = useState("pending");
     const [showCreateForm, setShowCreateForm] = useState("false");
-    const [pending, setPending] = useState();
+    const [pendings, setPending] = useState([]);
 
     useEffect(() => {
         const fetchPendingTasks = async () => {
             try {
-                const res = await axios.get("/api/pending/tasks");
+                const res = await axios.get("/pending/tasks");
                 console.log(res.data.pendingTasks);
                 setPending(res.data.pendingTasks);
             } catch (error) {
@@ -65,7 +65,9 @@ export default function Main() {
             <div className="mt-4 space-y-6">
                 {activeTab === "pending" && (
                     <div>
-                        <h1>Pending Tasks</h1>
+                        {pendings.map((pending) => (
+                            <h1>{pending.title}</h1>
+                        ))}
                     </div>
                 )}
                 {activeTab === "in-progress" && (
