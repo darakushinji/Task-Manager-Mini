@@ -28,4 +28,17 @@ class TaskManagerController extends Controller
             'pendingTasks' => $pendingTasks
         ]);
     }
+
+    public function getInProgress()
+    {
+        $inProgress = Task::where('user_id', auth()->id())
+            ->where('status', 'in-progress')
+            ->latest()
+            ->get();
+        
+        return response()->json([
+            'inProgress' => $inProgress
+        ]);
+    }
+
 }

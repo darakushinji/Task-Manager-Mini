@@ -4,7 +4,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 
 export default function Main() {
     const [activeTab, setActiveTab] = useState("pending");
-    const [showCreateForm, setShowCreateForm] = useState("false");
+    const [showCreateForm, setShowCreateForm] = useState(false);
     const [pendings, setPending] = useState([]);
 
     useEffect(() => {
