@@ -29,6 +29,8 @@ Route::middleware('auth')->group(function () {
 // api routes
 Route::middleware(['api.auth'])->group(function () {
     Route::get('/pending/tasks', [TaskManagerController::class, 'getPending']);
+    Route::get('/in-progress/tasks', [TaskManagerController::class, 'getInProgress']);
+    Route::get('/completed/tasks', [TaskManagerController::class, 'getCompleted']);
 });
 
 
