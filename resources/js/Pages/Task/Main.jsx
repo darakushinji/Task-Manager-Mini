@@ -6,7 +6,10 @@ export default function Main() {
     const [activeTab, setActiveTab] = useState("pending");
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [pendings, setPending] = useState([]);
+    const [inProgress, setInProgress] = useState([]);
+    const [completed, setCompleted] = useState([]);
 
+    // for pending tasks
     useEffect(() => {
         const fetchPendingTasks = async () => {
             try {
@@ -21,6 +24,37 @@ export default function Main() {
         const interval = setInterval(fetchPendingTasks, 1000);
         return () => clearInterval(interval);
     }, []);
+
+    // for in-progress tasks
+    useEffect(() => {
+        const fetchingInProgress = async () => {
+            try {
+                const res = await axios.get("/in-progress/tasks");
+                setInProgress(res.data.inProgress);
+            } catch (error) {
+                console.error("Error fetching in-progress tasks, ", error);
+            }
+        };
+
+        fetchingInProgress();
+        const interval = setInterval(fetchingInProgress, 1000);
+        return () => clearInterval(interval);
+    });
+
+    // for completed tasks
+    useEffect(() => {
+        const fetchingCompleted = async () => {
+            try {
+                const res = await axios.get("/completed/tasks");
+                setCompleted(res.data.completed);
+            } catch (error) {
+                console.error("Error fetching completed tasks, ", error);
+            }
+        };
+        fetchingCompleted();
+        const interval = setInterval(fetchingCompleted, 1000);
+        return () => clearInterval(interval);
+    });
 
     return (
         <AuthenticatedLayout>
