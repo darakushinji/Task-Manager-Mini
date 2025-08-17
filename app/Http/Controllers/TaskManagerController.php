@@ -53,4 +53,15 @@ class TaskManagerController extends Controller
         ]);
     }
 
+    public function updatePending($id)
+    {
+        $task = Task::FindOrFail($id);
+
+        $task->update([
+            'status' => 'in-progress'
+        ]);
+
+        return back()->with('success', 'task updated successfully.');
+    }
+
 }
