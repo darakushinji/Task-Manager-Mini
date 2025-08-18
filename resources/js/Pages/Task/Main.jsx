@@ -57,6 +57,11 @@ export default function Main() {
         return () => clearInterval(interval);
     }, []);
 
+    // handle update status
+    const handleUpdateStatus = (e) => {
+        e.preventDefault();
+    };
+
     return (
         <AuthenticatedLayout>
             <div className="flex justify-between items-center mb-4">

@@ -61,7 +61,10 @@ class TaskManagerController extends Controller
             'status' => 'in-progress'
         ]);
 
-        return back()->with('success', 'task updated successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Task updated successfully.',
+            'task' => $task,
+        ]);
     }
-
 }
