@@ -58,8 +58,16 @@ export default function Main() {
     }, []);
 
     // handle update status
-    const handleUpdateStatus = (e) => {
-        e.preventDefault();
+    const handleUpdateStatus = async (id) => {
+        try {
+            const res = await axios.put(`/task/${id}/update`);
+            console.log(res.data);
+
+            setPending((prev) => prev.filter((task) => task.id !== id));
+            setInProgress((prev) => [...prev, res.data.task]);
+        } catch (error) {
+            console.error("Error updating task status", error);
+        }
     };
 
     return (
@@ -110,6 +118,14 @@ export default function Main() {
                                 <div key={task.id}>
                                     <p>{task.title}</p>
                                     <p>{task.description}</p>
+                                    <button
+                                        onClick={() =>
+                                            handleUpdateStatus(task.id)
+                                        }
+                                        className="mt-2 bg-purple-600 text-white px-3 py-1 rounded"
+                                    >
+                                        Move to In-Progress
+                                    </button>
                                 </div>
                             ))
                         ) : (
