@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useForm } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 
 export default function Main() {
@@ -8,6 +9,23 @@ export default function Main() {
     const [pendings, setPending] = useState([]);
     const [inProgress, setInProgress] = useState([]);
     const [completed, setCompleted] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [error, setErrors] = useState({});
+
+    // useForm
+    const { data, setData, post, processing, errors, reset } = useForm({
+        title: "",
+        description: "",
+    });
+
+    const handleStoreTask = (e) => {
+        e.preventDefault();
+        post("/tasks");
+        reset();
+    };
 
     // for pending tasks
     useEffect(() => {
@@ -57,6 +75,22 @@ export default function Main() {
         return () => clearInterval(interval);
     }, []);
 
+    // category
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await axios.get("/categories");
+                console.log("Categories", res.data.categories);
+                setCategories(res.data.categories);
+            } catch (error) {
+                console.error("Error fetching categories", error);
+            }
+        };
+        fetchCategories();
+        const interval = setInterval(fetchCategories, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
     // handle update status
     const handleUpdateStatus = async (id) => {
         try {
@@ -67,6 +101,43 @@ export default function Main() {
             setInProgress((prev) => [...prev, res.data.task]);
         } catch (error) {
             console.error("Error updating task status", error);
+        }
+    };
+
+    const handleUpdateCompleteStatus = async (id) => {
+        try {
+            const res = await axios.put(`/task/completed/${id}/update`);
+
+            setInProgress((prev) => prev.filter((task) => task.id !== id));
+            setCompleted((prev) => [...prev, res.data.task]);
+        } catch (error) {
+            console.error("Error updating task status", error);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setErrors({});
+
+        try {
+            const res = await axios.post("/tasks", {
+                title,
+                description,
+                category_id: selectedCategory,
+            });
+            console.log("Task created:", res.data);
+
+            setTitle("");
+            setDescription("");
+            setSelectedCategory("");
+
+            // Add new task to pending
+            setPending((prev) => [...prev, res.data.task]);
+
+            setShowCreateForm(false);
+        } catch (error) {
+            alert("Tangina mo wala pa rin.");
+            console.error("Error creating task", error);
         }
     };
 
@@ -100,12 +171,44 @@ export default function Main() {
             {showCreateForm && (
                 <div className="bg-gray-100 p-4 rounded-lg mb-4">
                     <h2 className="font-bold mb-2">New Task</h2>
-                    <form>
+                    <form onSubmit={handleSubmit}>
                         <input
                             type="text"
                             placeholder="Task title"
                             className="border p-2 w-full mb-2"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
                         />
+
+                        <textarea
+                            placeholder="Description"
+                            className="border p-2 w-full mb-2"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+
+                        <select
+                            className="border p-2 w-full mb-2"
+                            value={selectedCategory}
+                            onChange={(e) =>
+                                setSelectedCategory(e.target.value)
+                            }
+                        >
+                            <option value="">- - Select Category - -</option>
+                            {categories.map((cat) => (
+                                <option key={cat.id} value={cat.id}>
+                                    {cat.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                        >
+                            Create Task
+                        </button>
                     </form>
                 </div>
             )}
@@ -140,6 +243,14 @@ export default function Main() {
                                 <div key={task.id}>
                                     <p>{task.title}</p>
                                     <p>{task.description}</p>
+                                    <button
+                                        onClick={() =>
+                                            handleUpdateCompleteStatus(task.id)
+                                        }
+                                        className="mt-2 bg-purple-600 text-white px-3 py-1 rounded"
+                                    >
+                                        Move to Completed
+                                    </button>
                                 </div>
                             ))
                         ) : (

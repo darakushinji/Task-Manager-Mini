@@ -21,7 +21,6 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/task', [TaskManagerController::class, 'main'])->name('task.main');
-    Route::put('/task/{id}/update', [TaskManagerController::class, 'updatePending']);
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -29,7 +28,11 @@ Route::middleware('auth')->group(function () {
 
 // api routes
 Route::middleware(['api.auth'])->group(function () {
+    Route::post('/tasks', [TaskManagerController::class, 'store']);
     Route::get('/pending/tasks', [TaskManagerController::class, 'getPending']);
+    Route::put('/task/{id}/update', [TaskManagerController::class, 'updatePending']);
+    Route::put('/task/completed/{id}/update', [TaskManagerController::class, 'updateInprogress']);
+    Route::get('/categories', [TaskManagerController::class, 'categories']);
     Route::get('/in-progress/tasks', [TaskManagerController::class, 'getInProgress']);
     Route::get('/completed/tasks', [TaskManagerController::class, 'getCompleted']);
 });

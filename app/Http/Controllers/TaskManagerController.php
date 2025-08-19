@@ -19,7 +19,8 @@ class TaskManagerController extends Controller
     {
         $user = Auth::id();
 
-        $pendingTasks = Task::where('user_id', auth()->id())
+        $pendingTasks = Task::with('category')
+            ->where('user_id', auth()->id())
             ->where('status', 'pending')
             ->latest()
             ->get();
@@ -65,6 +66,52 @@ class TaskManagerController extends Controller
             'success' => true,
             'message' => 'Task updated successfully.',
             'task' => $task,
+        ]);
+    }
+
+    public function updateInProgress($id)
+    {
+        $task = Task::findOrFail($id);
+
+        $task->update([
+            'status' => 'completed',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Task updated successfully.',
+            'task' => $task,
+        ]);
+    }
+
+    public function categories()
+    {
+        $categories = Category::all();
+
+        return response()->json([
+            'categories' => $categories,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable',
+            'category_id' => 'required|exists:categories,id',
+        ]);
+
+        $task = Task::create([
+            'user_id' => auth()->id(),
+            'category_id' => $request->category_id,
+            'title' => $request->title,
+            'description' => $request->description,
+            'status' => 'pending'
+        ]);
+
+        return response()->json([
+            'success' => 'task created successfully',
+            'task' => $task
         ]);
     }
 }
