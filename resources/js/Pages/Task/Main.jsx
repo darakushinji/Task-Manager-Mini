@@ -15,18 +15,6 @@ export default function Main() {
     const [selectedCategory, setSelectedCategory] = useState("");
     const [error, setErrors] = useState({});
 
-    // useForm
-    const { data, setData, post, processing, errors, reset } = useForm({
-        title: "",
-        description: "",
-    });
-
-    const handleStoreTask = (e) => {
-        e.preventDefault();
-        post("/tasks");
-        reset();
-    };
-
     // for pending tasks
     useEffect(() => {
         const fetchPendingTasks = async () => {
@@ -244,6 +232,7 @@ export default function Main() {
                                 <div key={task.id}>
                                     <p>{task.title}</p>
                                     <p>{task.description}</p>
+                                    <p>Category: {task.category?.name}</p>
                                     <button
                                         onClick={() =>
                                             handleUpdateCompleteStatus(task.id)
@@ -266,6 +255,7 @@ export default function Main() {
                                 <div key={task.id}>
                                     <p>{task.title}</p>
                                     <p>{task.description}</p>
+                                    <p>Category: {task.category?.name}</p>
                                 </div>
                             ))
                         ) : (
