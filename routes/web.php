@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
 // api routes
 Route::middleware(['api.auth'])->group(function () {
     Route::post('/tasks', [TaskManagerController::class, 'store']);
+    Route::put('/tasks/{id}/update', [TaskManagerController::class, 'editTask']);
     Route::get('/pending/tasks', [TaskManagerController::class, 'getPending']);
     Route::put('/task/{id}/update', [TaskManagerController::class, 'updatePending']);
     Route::put('/task/completed/{id}/update', [TaskManagerController::class, 'updateInprogress']);

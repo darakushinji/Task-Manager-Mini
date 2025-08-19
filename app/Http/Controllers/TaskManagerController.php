@@ -118,4 +118,27 @@ class TaskManagerController extends Controller
             'task' => $task
         ]);
     }
+
+    public function editTask(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required|string:max:255',
+            'description' => 'nullable|string',
+            'category_id' => 'required|exists:categories,id',
+        ]);
+
+        $task = Task::findOrFail($id);
+        $task->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+        ]);
+        $task->save();
+
+        $task->load('category');
+
+        return response()->json([
+            'message' => 'Task updated successfully!'
+        ]);
+    }
 }
