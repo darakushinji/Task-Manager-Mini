@@ -221,6 +221,7 @@ export default function Main() {
                                 <div key={task.id}>
                                     <p>{task.title}</p>
                                     <p>{task.description}</p>
+                                    <p>Category: {task.category?.name}</p>
                                     <button
                                         onClick={() =>
                                             handleUpdateStatus(task.id)

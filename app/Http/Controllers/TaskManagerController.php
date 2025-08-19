@@ -32,7 +32,8 @@ class TaskManagerController extends Controller
 
     public function getInProgress()
     {
-        $inProgress = Task::where('user_id', auth()->id())
+        $inProgress = Task::with('category')
+            ->where('user_id', auth()->id())
             ->where('status', 'in-progress')
             ->latest()
             ->get();
@@ -44,7 +45,8 @@ class TaskManagerController extends Controller
 
     public function getCompleted()
     {
-        $completed = Task::where('user_id', auth()->id())
+        $completed = Task::with('category')
+            ->where('user_id', auth()->id())
             ->where('status', 'completed')
             ->latest()
             ->get();
@@ -108,6 +110,8 @@ class TaskManagerController extends Controller
             'description' => $request->description,
             'status' => 'pending'
         ]);
+
+        $task->load('category');
 
         return response()->json([
             'success' => 'task created successfully',
