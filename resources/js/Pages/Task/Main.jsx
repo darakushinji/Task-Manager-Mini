@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useForm } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 
 export default function Main() {
@@ -13,7 +12,12 @@ export default function Main() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
-    const [error, setErrors] = useState({});
+    const [errors, setErrors] = useState({});
+    const [showModal, setShowModal] = useState(false);
+    const [selectedTask, setSelectedTask] = useState(null);
+    const [newTitle, setNewTitle] = useState("");
+    const [newDescription, setNewDescription] = useState("");
+    const [newCategory, setNewCategory] = useState("");
 
     // for pending tasks
     useEffect(() => {
@@ -129,6 +133,14 @@ export default function Main() {
         }
     };
 
+    const openModal = (taskId) => {
+        setSelectedTask(taskId);
+        setNewTitle("");
+        setNewDescription("");
+        setNewCategory("");
+        setShowModal(true);
+    };
+
     return (
         <AuthenticatedLayout>
             <div className="flex justify-between items-center mb-4">
@@ -155,51 +167,6 @@ export default function Main() {
                     {showCreateForm ? "Close" : "Create Task"}
                 </button>
             </div>
-
-            {showCreateForm && (
-                <div className="bg-gray-100 p-4 rounded-lg mb-4">
-                    <h2 className="font-bold mb-2">New Task</h2>
-                    <form onSubmit={handleSubmit}>
-                        <input
-                            type="text"
-                            placeholder="Task title"
-                            className="border p-2 w-full mb-2"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                        />
-
-                        <textarea
-                            placeholder="Description"
-                            className="border p-2 w-full mb-2"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
-
-                        <select
-                            className="border p-2 w-full mb-2"
-                            value={selectedCategory}
-                            onChange={(e) =>
-                                setSelectedCategory(e.target.value)
-                            }
-                        >
-                            <option value="">- - Select Category - -</option>
-                            {categories.map((cat) => (
-                                <option key={cat.id} value={cat.id}>
-                                    {cat.name}
-                                </option>
-                            ))}
-                        </select>
-
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="bg-blue-500 text-white px-4 py-2 rounded"
-                        >
-                            Create Task
-                        </button>
-                    </form>
-                </div>
-            )}
 
             <div className="mt-4 space-y-6">
                 {activeTab === "pending" && (
@@ -264,6 +231,60 @@ export default function Main() {
                     </div>
                 )}
             </div>
+
+            {showCreateForm && (
+                <div className="bg-gray-100 p-4 rounded-lg mb-4">
+                    <h2 className="font-bold mb-2">New Task</h2>
+                    <form onSubmit={handleSubmit}>
+                        <input
+                            type="text"
+                            placeholder="Task title"
+                            className="border p-2 w-full mb-2"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                        />
+
+                        <textarea
+                            placeholder="Description"
+                            className="border p-2 w-full mb-2"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+
+                        <select
+                            className="border p-2 w-full mb-2"
+                            value={selectedCategory}
+                            onChange={(e) =>
+                                setSelectedCategory(e.target.value)
+                            }
+                        >
+                            <option value="">- - Select Category - -</option>
+                            {categories.map((cat) => (
+                                <option key={cat.id} value={cat.id}>
+                                    {cat.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                        >
+                            Create Task
+                        </button>
+                    </form>
+                </div>
+            )}
+
+            {showModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                        <h2 className="text-lg font-bold">Edit Task</h2>
+                        <input />
+                    </div>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }
