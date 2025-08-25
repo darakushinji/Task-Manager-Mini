@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskManagerController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,7 +22,10 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/task', [TaskManagerController::class, 'main'])->name('task.main');
+    Route::get('/team', [TeamController::class, 'main'])->name('team.main');
+    Route::get('/team/{id}/show', [TeamController::class, 'showTeam'])->name('team.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
@@ -36,6 +40,10 @@ Route::middleware(['api.auth'])->group(function () {
     Route::get('/categories', [TaskManagerController::class, 'categories']);
     Route::get('/in-progress/tasks', [TaskManagerController::class, 'getInProgress']);
     Route::get('/completed/tasks', [TaskManagerController::class, 'getCompleted']);
+    Route::get('/fetch', [TeamController::class, 'fetchTeam']);
+    Route::post('/team', [TeamController::class, 'store']);
+    Route::get('/team/{id}/members', [TeamController::class, 'fetchMembers']);
+    Route::post('/owner/team/{id}/add-member', [TeamController::class, 'addMember']);
 });
 
 

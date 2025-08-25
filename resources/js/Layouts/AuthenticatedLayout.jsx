@@ -36,6 +36,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Tasks
                                 </NavLink>
+                                <NavLink
+                                    href={route("team.main")}
+                                    active={route().current("team.main")}
+                                >
+                                    Team
+                                </NavLink>
                             </div>
                         </div>
 
