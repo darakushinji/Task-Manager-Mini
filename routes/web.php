@@ -44,7 +44,8 @@ Route::middleware(['api.auth'])->group(function () {
     Route::post('/team', [TeamController::class, 'store']);
     Route::get('/team/{id}/members', [TeamController::class, 'fetchMembers']);
     Route::post('/owner/team/{id}/add-member', [TeamController::class, 'addMember']);
-});
+    Route::get('/users/search', [TeamController::class, 'searchUsers']);
+}); 
 
 
 require __DIR__.'/auth.php';

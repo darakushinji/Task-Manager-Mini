@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Team;
+use App\Models\User;
 use Inertia\Inertia;
 
 class TeamController extends Controller
@@ -70,12 +71,10 @@ class TeamController extends Controller
     public function addMember(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|exists:users,name',
+            'user_id' => 'required|integer|exists:users,id',
         ]);
 
         $team = Team::where('owner_id', auth()->id())->findOrFail($id);
-
-        $user = User::where('name', $request->name)->firstOrFail();
 
         $team->users()->syncWithoutDetaching($request->user_id);
 
@@ -84,16 +83,20 @@ class TeamController extends Controller
         return response()->json([
             'success' => true,
             'team' => $team,
-            'user' => $user,
         ]);
     }
 
-    public function fetchAccounts()
+    public function searchUsers(Request $request)
     {
-        $accounts = User::all()->get();
-
-        return response()->json([
-            'accounts' => $accounts,
+        $request->validate([
+            'query' => 'required|string|min:1'
         ]);
+
+        $users = User::where('name', 'like', '%' . $request->input('query') . '%')
+            ->where('id', '!=', auth()->id())
+            ->limit(10)
+            ->get(['id', 'name']);
+
+        return response()->json($users);
     }
 }

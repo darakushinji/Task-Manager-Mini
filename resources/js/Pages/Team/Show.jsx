@@ -5,8 +5,10 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 export default function Show({ teamId, teamName }) {
     const [owner, setOwner] = useState(null);
     const [members, setMembers] = useState([]);
-    const [newMemberId, setNewMemberId] = useState("");
+    const [search, setSearch] = useState("");
+    const [suggestions, setSuggestions] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         const fetchMembers = async () => {
@@ -25,22 +27,33 @@ export default function Show({ teamId, teamName }) {
         return () => clearInterval(interval);
     }, [teamId]);
 
-    const handleAddMember = async (e) => {
-        e.preventDefault();
-        if (!newMemberId) return alert("Please enter a user ID.");
+    const handleSearch = async (e) => {
+        const value = e.target.value;
+        setSearch(value);
 
+        if (value.length > 1) {
+            const res = await axios.get(`/users/search?query=${value}`);
+            setSuggestions(res.data);
+        } else {
+            setSuggestions([]);
+        }
+    };
+
+    const handleAddMember = async (userId) => {
         setLoading(true);
         try {
             await axios.post(`/owner/team/${teamId}/add-member`, {
-                user_id: newMemberId,
+                user_id: userId,
             });
-            setNewMemberId("");
+            setSearch("");
+            setSuggestions([]);
         } catch (error) {
             console.error("Error adding member", error);
         } finally {
             setLoading(false);
         }
     };
+
     return (
         <AuthenticatedLayout>
             <div className="p-4">
@@ -65,24 +78,26 @@ export default function Show({ teamId, teamName }) {
                     )}
                 </ul>
 
-                <div classNamme="mt-6 border-t pt-4">
-                    <h3>Add Member</h3>
-                    <form onSubmit={handleAddMember} className="flex gap-2">
-                        <input
-                            type="number"
-                            placeholder="Enter user ID"
-                            value={newMemberId}
-                            onChange={(e) => setNewMemberId(e.target.value)}
-                            className="border rounded px-3 py-2 w-48"
-                        />
-                        <button
-                            type="submit"
-                            className="bg-blue-500 text-white px-4 py-2 rounded"
-                            disabled={loading}
-                        >
-                            {loading ? "Adding..." : "Add"}
-                        </button>
-                    </form>
+                <div>
+                    <input
+                        type="text"
+                        placeholder="Search user..."
+                        value={search}
+                        onChange={handleSearch}
+                    />
+                    {suggestions.length > 0 && (
+                        <ul className="border rounded mt-2 bg-white">
+                            {suggestions.map((user) => (
+                                <li
+                                    key={user.id}
+                                    className="p-2 hover:bg-gray-200 cursor-pointer"
+                                    onClick={() => handleAddMember(user.id)}
+                                >
+                                    {user.name}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
             </div>
         </AuthenticatedLayout>
