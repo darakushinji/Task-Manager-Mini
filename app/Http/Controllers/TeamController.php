@@ -70,10 +70,12 @@ class TeamController extends Controller
     public function addMember(Request $request, $id)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'name' => 'required|string|exists:users,name',
         ]);
 
         $team = Team::where('owner_id', auth()->id())->findOrFail($id);
+
+        $user = User::where('name', $request->name)->firstOrFail();
 
         $team->users()->syncWithoutDetaching($request->user_id);
 
@@ -82,6 +84,7 @@ class TeamController extends Controller
         return response()->json([
             'success' => true,
             'team' => $team,
+            'user' => $user,
         ]);
     }
 
