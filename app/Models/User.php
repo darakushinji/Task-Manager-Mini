@@ -50,4 +50,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Task::class);
     }
+
+    // for teams
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class)->withPivot('role')->withTimesTamps();
+    }
+
+    public function ownedTeams()
+    {
+        return $this->hasMany(Team::class, 'owner_id');
+    }
 }
